@@ -2,7 +2,7 @@
 Picross solver using Answer Set Programming and Python
 
 # What? Why?
-My passion for puzzles and in particular picross derived in the challenge of implementing a simple picross solver using Answer Set Programming due to it's flexibility and succesfulness with many other puzzles. Particularly for this project we'll be using the grounder gringo and the clasp solver grouped in the tool clingo. 
+My passion for puzzles and, in particular, Picross (aka Nonograms) derived in the challenge of implementing a simple picross solver using Answer Set Programming due to it's flexibility and succesfulness with many other puzzles. Particularly for this project we'll be using the grounder gringo and the clasp solver grouped in the tool clingo. 
 
 The challenge consists of many parts:
  - Creating the solver in ASP to solve any correct Picross out there

@@ -41,6 +41,6 @@ for idx,sol in enumerate(solutions):
     cells = re.findall(r'hcell\(([0-9]+),([0-9]+)\)', sol)
     for c in cells:
         matrix[int(c[1])-1, int(c[0])-1] = 1
-    print ("Solution #" + str(idx))
+    print ("Solution #" + str(idx+1))
     print (matrixstr(matrix))
     print ("")

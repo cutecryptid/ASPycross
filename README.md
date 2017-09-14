@@ -2,13 +2,16 @@
 Picross solver using Answer Set Programming and Python
 
 # What? Why?
-My passion for puzzles and, in particular, Picross (aka Nonograms) derived in the challenge of implementing a simple picross solver using Answer Set Programming due to it's flexibility and succesfulness with many other puzzles. Particularly for this project we'll be using the grounder gringo and the clasp solver grouped in the tool clingo. 
+My passion for puzzles and, in particular, Picross (aka Nonograms) derived in the challenge of implementing a simple picross solver using Answer Set Programming due to it's flexibility and succesfulness with many other puzzles. Particularly for this project we'll be using the grounder gringo and the clasp solver grouped in the tool clingo.
 
-The challenge consists of many parts:
- - Creating the solver in ASP to solve any correct Picross out there
- - Make it usable and nice through python
- - Implement a web interface to input the puzzles in a user-friendly way
- - See if we can implement some Artificial Vision to the system and enable input through a picture of a Picross puzzle.
+# What's working
+Right now, ASPycross is a command line tool that takes any Picross puzzle in the form os ASP facts (see examples in input folder) and pretty-prints the solution.
+The current work is focused on making it Python3 compatible and developing a web GUI with Electron or some other serverless light web framework.
+
+# Requirements
+For the early Command Line versions you just need:
+ - The latest version of clingo
+ - Python 2.7
 
 # Installation
-Download clingo 3.0.5 from the Potassco group's sourceforge and add it to the path, make sure that you have python 2.7 up and running in your system and then call `python aspycross /path/to/your/puzzle.lp`
+Download the latest clingo from http://github.com/potassco/clingo and add it to the path or copy it to the ASPycross folder, make sure that you have python installed in your system and then call `python aspycross /path/to/your/puzzle.lp`

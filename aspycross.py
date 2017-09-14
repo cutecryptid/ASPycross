@@ -1,73 +1,46 @@
 import argparse
-import subprocess
+from subprocess import Popen, PIPE
 import re
+import numpy as np
 
-class Cell(object):
-	"""Storage class for cells, just a symbol and a 2D position"""
-	def __init__(self, symbol, row, col):
-		self.symbol = symbol
-		self.row = row
-		self.col = col
+def matrixstr(m):
+    mstr = ""
+    for row in m:
+        rstr = ""
+        for c in row:
+            if c == 1:
+                rstr += "o"
+            else:
+                rstr += "x"
+        rstr += "\n"
+        mstr += rstr
+    return mstr
 
-	def __str__(self):
-		return self.symbol
 
-class PicrossSolution(object):
-	"""Storage class for the picross solution"""
-	def __init__(self, raw_sol):
-		self.raw_sol = raw_sol
-		self.cells = self.parse_solution()
+parser = argparse.ArgumentParser()
+parser.add_argument("picross", help="route of the picross hints")
+parser.add_argument("-n", "--nsols", help="number of solutions, all displayed by default",
+                    default=0)
+args = parser.parse_args()
 
-	def parse_solution(self):
-		out = self.raw_sol
-		size_x = re.search('size_x\(([0-9]+)\)', out)
-		size_y = re.search('size_y\(([0-9]+)\)', out)
-		size_x = int(size_x.group(1))
-		size_y = int(size_y.group(1))
-		cells = re.findall('out_cell\(([xo]),([0-9]+),([0-9]+)\)', out)
-		sol_cells = []
-		for x in range(size_x):
-			sol_cells += [[]]
-			for y in range(size_y):
-				sol_cells[x] += [0]
-		for cell in cells:
-			sol_cells[int(cell[1])-1][int(cell[2])-1] = Cell(cell[0], int(cell[1])-1, int(cell[2])-1)
-		return sol_cells
+picross = args.picross
 
-	def __str__(self):
-		ret_str = ""
-		for row in self.cells:
-			ret_str += "|"
-			for cell in row:
-				ret_str += str(cell)
-			ret_str += "|\n"
-		return ret_str
-		
-def main():
-	parser = argparse.ArgumentParser(description='ASPycross - Picross solving with ASP and python')
-	parser.add_argument('puzzle', metavar='XML_SCORE',
-	                   help='input puzzle in ASP format for solving')
-	parser.add_argument('-n', '--num_sols', metavar='N', nargs=1, default=1, type=int,
-	                   help='max number of ASP solutions, by default all of them')
+p = Popen(["clingo5", "picross_solve_block.lp", picross, "-n", str(args.nsols)],
+            stdout=PIPE)
+out, err = p.communicate()
 
-	args = parser.parse_args()
+solutions = re.split(r'Answer:\s[0-9]+\n', out)
 
-	infile = args.puzzle
+info = solutions[0]
+solutions = solutions[1:]
 
-	n = args.num_sols
-	if args.num_sols != 1:
-		n = args.num_sols[0]
-
-	picross_args = ("clingo", infile,"picross.lp","-n", str(n))
-	picross_proc = subprocess.Popen(picross_args, stdout=subprocess.PIPE)
-	picross_out = picross_proc.stdout.read()
-
-	print picross_out
-	print "-------------------------"
-	print PicrossSolution(picross_out)
-
-	if (re.search("UNSATISFIABLE",picross_out) != None):
-		sys.exit("UNSATISFIABLE, stopping execution.")
-
-if __name__ == "__main__":
-    main()
+for idx,sol in enumerate(solutions):
+    height = int(re.findall(r'maxheight\(([0-9]+)\)', sol)[0])
+    width = int(re.findall(r'maxwidth\(([0-9]+)\)', sol)[0])
+    matrix = np.zeros((height, width))
+    cells = re.findall(r'hcell\(([0-9]+),([0-9]+)\)', sol)
+    for c in cells:
+        matrix[int(c[1])-1, int(c[0])-1] = 1
+    print ("Solution #" + str(idx))
+    print (matrixstr(matrix))
+    print ("")

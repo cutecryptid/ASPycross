@@ -24,39 +24,35 @@ def main():
     txt = "Resolve a Picross problem and print the result."
     parser = argparse.ArgumentParser(description=txt)
     parser.add_argument("picross", help="route of the picross hints")
-    parser.add_argument("-n", "--nsols",
-                        help="number of solutions, all displayed by default",
-                        default=0)
 
     # Get the parameters
     args = parser.parse_args()
     data = args.picross
-    nsols = args.nsols
 
     # Set the program path
     dirpath = os.path.dirname(os.path.abspath(__file__))
     program = os.path.join(dirpath, "picross_solve_block.lp")
 
     # Resolve the problem instance
-    answers = solve(program, data, nb_model=nsols)
+    answers = solve(program, data, nb_model=1)
+    answer = next(answers.by_predicate)
 
-    # Print each solution
-    for idx, answer in enumerate(answers.by_predicate):
-        # Get height and width
-        height = next(iter(answer["maxheight"]))[0]
-        width = next(iter(answer["maxwidth"]))[0]
+    # Get height and width
+    height = next(iter(answer["maxheight"]))[0]
+    width = next(iter(answer["maxwidth"]))[0]
 
-        # Get colorated cells
-        cells = answer["hcell"]
+    # Get colorated cells
+    cells = answer["hcell"]
 
-        # Construct the associated (complete) matrix
-        matrix = np.zeros((height, width))
-        for c in cells:
-            matrix[c[1] - 1, c[0] - 1] = 1
+    # Construct the associated (complete) matrix
+    matrix = np.zeros((height, width))
+    for c in cells:
+        matrix[c[1] - 1, c[0] - 1] = 1
 
-        # Print it
-        print("Solution #{}".format(idx + 1))
-        print(matrixstr(matrix))
+    # Print the solution
+    print("Solution :")
+    print(matrixstr(matrix))
+
 
 
 if __name__ == "__main__":

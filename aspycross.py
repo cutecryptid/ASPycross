@@ -8,18 +8,15 @@ import numpy as np
 from clyngor import ASP, solve
 
 
-def matrixstr(m):
-    mstr = ""
-    for row in m:
+def matrixstr(matrix, pos_symbol='o', neg_symbol='-'):
+    """Print the matrix representation."""
+    mstr = []
+    for row in matrix:
         rstr = ""
-        for c in row:
-            if c == 1:
-                rstr += "o"
-            else:
-                rstr += "x"
-        rstr += "\n"
-        mstr += rstr
-    return mstr
+        for col in row:
+            rstr += pos_symbol if col else neg_symbol
+        mstr.append(rstr)
+    return '\n'.join(mstr)
 
 
 def main():

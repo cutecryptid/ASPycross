@@ -1,7 +1,12 @@
+# -*- coding: utf-8 -*-
+"""Main script to start the resolution."""
+
+import os
 import argparse
-from subprocess import Popen, PIPE
-import re
 import numpy as np
+
+from clyngor import ASP, solve
+
 
 def matrixstr(m):
     mstr = ""
@@ -17,30 +22,45 @@ def matrixstr(m):
     return mstr
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("picross", help="route of the picross hints")
-parser.add_argument("-n", "--nsols", help="number of solutions, all displayed by default",
-                    default=0)
-args = parser.parse_args()
+def main():
+    # Initialize the script parser
+    txt = "Resolve a Picross problem and print the result."
+    parser = argparse.ArgumentParser(description=txt)
+    parser.add_argument("picross", help="route of the picross hints")
+    parser.add_argument("-n", "--nsols",
+                        help="number of solutions, all displayed by default",
+                        default=0)
 
-picross = args.picross
+    # Get the parameters
+    args = parser.parse_args()
+    data = args.picross
+    nsols = args.nsols
 
-p = Popen(["clingo5", "picross_solve_block.lp", picross, "-n", str(args.nsols)],
-            stdout=PIPE)
-out, err = p.communicate()
+    # Set the program path
+    dirpath = os.path.dirname(os.path.abspath(__file__))
+    program = os.path.join(dirpath, "picross_solve_block.lp")
 
-solutions = re.split(r'Answer:\s[0-9]+\n', out)
+    # Resolve the problem instance
+    answers = solve(program, data, nb_model=nsols)
 
-info = solutions[0]
-solutions = solutions[1:]
+    # Print each solution
+    for idx, answer in enumerate(answers.by_predicate):
+        # Get height and width
+        height = next(iter(answer["maxheight"]))[0]
+        width = next(iter(answer["maxwidth"]))[0]
 
-for idx,sol in enumerate(solutions):
-    height = int(re.findall(r'maxheight\(([0-9]+)\)', sol)[0])
-    width = int(re.findall(r'maxwidth\(([0-9]+)\)', sol)[0])
-    matrix = np.zeros((height, width))
-    cells = re.findall(r'hcell\(([0-9]+),([0-9]+)\)', sol)
-    for c in cells:
-        matrix[int(c[1])-1, int(c[0])-1] = 1
-    print ("Solution #" + str(idx+1))
-    print (matrixstr(matrix))
-    print ("")
+        # Get colorated cells
+        cells = answer["hcell"]
+
+        # Construct the associated (complete) matrix
+        matrix = np.zeros((height, width))
+        for c in cells:
+            matrix[c[1] - 1, c[0] - 1] = 1
+
+        # Print it
+        print("Solution #{}".format(idx + 1))
+        print(matrixstr(matrix))
+
+
+if __name__ == "__main__":
+        main()

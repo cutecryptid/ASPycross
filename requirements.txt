@@ -1,0 +1,15 @@
+Arpeggio==1.9.2
+attrs==19.3.0
+clyngor==0.3.31
+importlib-metadata==1.6.0
+more-itertools==8.2.0
+numpy==1.18.2
+packaging==20.3
+pluggy==0.13.1
+py==1.8.1
+pyparsing==2.4.7
+pyPEG2==2.15.2
+pytest==5.4.1
+six==1.14.0
+wcwidth==0.1.9
+zipp==3.1.0
